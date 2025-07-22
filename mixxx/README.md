@@ -8,4 +8,4 @@ all playlists in the MIXXX database will be exported into tracklists as `txt` fi
 
 (existing files will be updated)
 
-## download [mixxx-history-exporter.exe](https://github.com/NikkyAI/setlist-export/releases/download/nightly/mixxx-history-exporter.exe)
+## download [mixxx-export.exe](https://github.com/NikkyAI/setlist-export/releases/download/nightly/mixxx-export.exe)

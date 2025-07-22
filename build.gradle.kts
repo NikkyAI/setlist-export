@@ -5,7 +5,26 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/8.14/samples
  * This project uses @Incubating APIs which are subject to change.
  */
+plugins {
+    kotlin("multiplatform") apply false
+    kotlin("plugin.serialization") apply false
+}
+
+allprojects {
+    group = "moe.nikky"
+    version = "1.0-SNAPSHOT"
+
+    repositories {
+        mavenCentral()
+    }
+}
+
 tasks {
+    val subprojects = listOf(
+        project(":traktor-export-converter"),
+        project(":rekordbox-export"),
+        project(":mixxx-export"),
+    )
     val packageZip by registering(Zip::class) {
         group = "package"
         subprojects.forEach { subproject ->

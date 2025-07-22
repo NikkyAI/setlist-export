@@ -13,10 +13,11 @@ plugins {
 
 rootProject.name = "setlist-export"
 
+include("shared")
 include("traktor")
 include("rekordbox")
 include("mixxx")
 
-project(":traktor").name = "traktor-history-converter"
-project(":rekordbox").name = "rekordbox-history-exporter"
-project(":mixxx").name = "mixxx-history-exporter"
+project(":traktor").name = "traktor-export-converter"
+project(":rekordbox").name = "rekordbox-export"
+project(":mixxx").name = "mixxx-export"

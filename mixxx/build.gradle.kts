@@ -3,22 +3,10 @@ import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     kotlin("multiplatform")
-//    id("app.cash.sqldelight")
-//    id("com.gradleup.shadow")
-//    application
-}
-
-group = "moe.nikky"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
+    kotlin("plugin.serialization")
 }
 
 kotlin {
-//    jvm() {
-//
-//    }
     mingwX64 {
         binaries {
             executable() {
@@ -32,19 +20,15 @@ kotlin {
                 }
             }
         }
-    }.also { target ->
-//        configInterop(target)
     }
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":shared"))
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:_")
             implementation("io.github.smyrgeorge:sqlx4k-sqlite:_")
 
             implementation("com.squareup.okio:okio:_")
             implementation("com.saveourtool.okio-extras:okio-extras:_")
-
-//            implementation("org.jetbrains.kotlinx:kotlinx-io-core:_")
-//            implementation("org.jetbrains.kotlinx:kotlinx-io-okio:_")
         }
         mingwMain.dependencies {
 //            implementation("io.ktor:ktor-client-winhttp:_")

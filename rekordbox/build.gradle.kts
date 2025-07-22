@@ -3,13 +3,12 @@ import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
 //    id("app.cash.sqldelight")
 //    id("com.gradleup.shadow")
 //    application
 }
 
-group = "moe.nikky"
-version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -37,6 +36,7 @@ kotlin {
     }
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":shared"))
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:_")
             implementation("io.github.smyrgeorge:sqlx4k-sqlite:_")
 

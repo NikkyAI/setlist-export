@@ -19,16 +19,12 @@ import kotlinx.cinterop.toKString
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
-import kotlinx.datetime.format.optional
-import kotlinx.datetime.parse
 import kotlinx.io.okio.asKotlinxIoRawSink
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import platform.posix.getenv
-import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -157,20 +153,20 @@ fun main(vararg args: String) {
     runBlocking {
 
 //        db.execute("PRAGMA key = '402fd482c38817c35ffa8ffb8c7d93143b749e7d315df7a81732a1ff43608497'")
-        val histories = db.fetchAll(
+        val playlists = db.fetchAll(
             """
                 SELECT h.Name        AS HistoryName,
                        sh.TrackNo    AS TrackNo,
-                       c.Title       AS SongName,
-                       c.ReleaseYear AS ReleaseYear,
+                       unixepoch(sh.updated_at) AS start,
+                       c.Title       AS Title,
+                       c.ReleaseYear AS year,
                        c.Length      AS Length,
                        c.BPM         AS BPM,
                        a.Name        AS Artist,
                        al.Name       AS Album,
                        g.Name        AS Genre,
                        l.Name        As Label,
-                       k.ScaleName   AS ScaleName,
-                       unixepoch(sh.updated_at) AS timestamp
+                       k.ScaleName   AS ScaleName
                 FROM djmdHistory h
                          JOIN
                      djmdSongHistory sh ON h.id = sh.HistoryID
@@ -194,21 +190,26 @@ fun main(vararg args: String) {
                 it.rows.groupBy {
                     it.get("HistoryName").asString()
                 }.map { (historyName, rows) ->
-                    History(
-                        name = historyName,
+                    val referenceTimestamp = rows.first().get("start").asLong().let {
+                    Instant.fromEpochSeconds(it)
+                }
+                    Playlist(
+                        title = historyName,
                         songs = rows.map { row ->
+                            val timestamp = row.get("start").asLong().let {
+                                Instant.fromEpochSeconds(it)
+                            }
                             Song(
-                                trackNo = row.get("TrackNo").asInt(),
-                                start = row.get("timestamp").asLong().let {
-                                    Instant.fromEpochMilliseconds(it)
-                                },
-                                length = row.get("Length").asInt().seconds,
-                                songName = row.get("SongName").asString(),
+                                position = row.get("TrackNo").asInt(),
+                                time = (timestamp - referenceTimestamp),
+                                timestamp = timestamp,
+                                duration = row.get("Length").asInt().seconds,
+                                title = row.get("Title").asString(),
                                 artist = row.get("Artist").asStringOrNull(),
                                 label = row.get("Label").asStringOrNull(),
                                 album = row.get("Album").asStringOrNull(),
                                 genre = row.get("Genre").asStringOrNull(),
-                                releaseYear = row.get("ReleaseYear").asIntOrNull(),
+                                year = row.get("year").asIntOrNull(),
                                 bpm = row.get("BPM").asInt() / 100.0f,
                                 scale = row.get("ScaleName").asStringOrNull(),
                             )
@@ -217,22 +218,16 @@ fun main(vararg args: String) {
                 }
             }.getOrThrow()
 
-        histories.forEach { history ->
-            val historyStart = history.songs.first().start
-            val txt = history.songs.joinToString(
-                separator = "\n",
-                prefix = "         artist | song \n"
-            ) {  song ->
-                val start = song.start - historyStart
-                val timestamp = start.formatTimestamp()
-                "$timestamp ${song.artist} | ${song.songName}"
-            }
-
-            val txtPath = "${history.name}.txt".toPath()
-            println("writing to $txtPath")
-            FS.write(txtPath) {
-                writeUtf8(txt)
-            }
+        playlists.forEach { playlist ->
+            Template.write(
+                playlist,
+                Song.serializer(),
+            )
+            genreBreakdown(playlist.songs) { genre }
         }
+
+        println("")
+        println("PRESS ANY BUTTON TO CLOSE")
+        readlnOrNull()
     }
 }

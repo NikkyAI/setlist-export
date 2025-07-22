@@ -8,6 +8,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
+import kotlinx.serialization.Serializable
 import okio.Path
 import okio.FileSystem
 import okio.buffer
@@ -16,32 +17,36 @@ import okio.Path.Companion.toPath
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-data class TrackList(
-    val title: String,
-    val tracks: List<TrackData>
-)
-
+@Serializable
 data class TrackData(
-    val trackNum: Int,
+    val position: Int,
+    @Serializable(with = DurationSerializer::class)
+    val time: Duration,
+    @Serializable(with = InstantSerializer::class)
+    val timestamp: Instant,
+    @Serializable(with = DurationSerializer::class)
+    val duration: Duration,
     val title: String,
     val artist: String,
     val genre: String?,
-    val startTime: Instant,
-    val duration: Duration,
     val deck: String?,
+    val key: String?,
 ) {
-    val endTime = startTime + duration
+    @Serializable(with = InstantSerializer::class)
+    val endTime = timestamp + duration
 }
 
 val durationFormat = LocalTime.Format {
+//    optional {
     hour(padding = Padding.NONE)
     char('h')
+//    }
     minute(padding = Padding.ZERO)
     char(':')
     second(padding = Padding.ZERO)
 }
 
-fun parseHtmlFile(filePath: Path): TrackList? {
+fun parseHtmlFile(filePath: Path): Playlist<TrackData>? {
     return try {
         val data = FileSystem.SYSTEM.source(filePath).buffer().use { source ->
             source.readUtf8()
@@ -49,7 +54,7 @@ fun parseHtmlFile(filePath: Path): TrackList? {
 
         val document = Ksoup.parse(data)
         val h1 = document.selectFirst("h1")
-        if(h1 == null) {
+        if (h1 == null) {
             println("Title (h1) not found")
             return null
         }
@@ -70,7 +75,7 @@ fun parseHtmlFile(filePath: Path): TrackList? {
         fun findField(fieldName: String): Elements.() -> String {
             val index = headerCells.indexOf(fieldName) // .takeUnless { it < 0 }
 
-            if(index < 0) {
+            if (index < 0) {
                 missingFields += fieldName
 //                    println("missing field $fieldName")
 //                        error("missing field '$fieldName' \navailable fields: $headerCells")
@@ -81,10 +86,11 @@ fun parseHtmlFile(filePath: Path): TrackList? {
                 this[index].text().trim()
             }
         }
+
         fun findFieldOptional(fieldName: String): Elements.() -> String? {
             val index = headerCells.indexOf(fieldName) // .takeUnless { it < 0 }
 
-            if(index < 0) {
+            if (index < 0) {
                 missingOptionalFields += fieldName
                 return { null }
 //                    println("missing field $fieldName")
@@ -104,46 +110,53 @@ fun parseHtmlFile(filePath: Path): TrackList? {
         val startTimeField = findField("Start Time")
         val durationField = findField("Duration")
         val deckField = findFieldOptional("Deck")
+        val keyField = findFieldOptional("Key")
 
 
-        if(missingOptionalFields.isNotEmpty()) {
+        if (missingOptionalFields.isNotEmpty()) {
             println("Missing optional fields:")
             println(missingOptionalFields.joinToString { "'$it'" })
         }
-        if(missingFields.isNotEmpty()) {
+        if (missingFields.isNotEmpty()) {
             println("Missing required fields:")
             println(missingFields.joinToString { "'$it'" })
         }
-        if(missingFields.isNotEmpty() || missingOptionalFields.isNotEmpty()) {
+        if (missingFields.isNotEmpty() || missingOptionalFields.isNotEmpty()) {
             println("Available Fields:")
             println(headerCells.joinToString { "'$it'" })
 
         }
 
-        if(missingFields.isNotEmpty()) {
+        if (missingFields.isNotEmpty()) {
             return null
         }
 
+        val firstRow = rows[1].select("td")
+        val referenceTimestamp = parseInstant(firstRow.startTimeField())
         for (i in 1 until rows.size) { // Skip the first row (header row)
             val cells = rows[i].select("td")
 //            println("parsing row: $cells")
             if (cells.size >= 10) {
+                val timestamp = parseInstant(cells.startTimeField())
                 tracks.add(
                     TrackData(
-                        trackNum = cells.trackNumField()?.toInt() ?: i,
+                        position = cells.trackNumField()?.toInt() ?: i,
+                        time = timestamp - referenceTimestamp,
                         title = cells.titleField(),
                         artist = cells.artistField(),
                         genre = cells.genreField(),
-                        startTime = parseStartTime(cells.startTimeField()),
+                        timestamp = timestamp,
                         duration = run {
                             val duration = cells.durationField()
 
-//                            println("parsing duration: $duration")
+                            println("parsing duration: $duration")
 
                             val localTime = LocalTime.parse("0h" + duration, durationFormat)
+//                            val localTime = LocalTime.parse(duration, durationFormat)
                             localTime.toSecondOfDay().seconds
                         },
-                        deck = cells.deckField()
+                        deck = cells.deckField(),
+                        key = cells.keyField()
                     )
 //                        .also {
 //                            println(it)
@@ -152,9 +165,9 @@ fun parseHtmlFile(filePath: Path): TrackList? {
             }
         }
 
-        TrackList(
+        Playlist(
             title = title,
-            tracks = tracks.sortedBy {it.startTime}
+            songs = tracks.sortedBy { it.timestamp }
         )
         //.sortedBy { it.trackNum }
 
@@ -179,23 +192,23 @@ val dateFormat = LocalDateTime.Format {
     second()
 }
 
-fun parseStartTime(startTimeString: String): Instant {
+fun parseInstant(startTimeString: String): Instant {
     return LocalDateTime.parse(
         startTimeString,
         dateFormat
     ).toInstant(TimeZone.currentSystemDefault())
 }
 
-fun createTracklist(trackList: TrackList) {
-    val tracks = trackList.tracks
-    val firstStartTime = tracks[0].startTime
-    var lastEndTime = tracks[0].startTime
+fun createTracklist(trackList: Playlist<TrackData>) {
+    val tracks = trackList.songs
+    val firstStartTime = tracks[0].timestamp
+    var lastEndTime = tracks[0].timestamp
 
     val tracklistContent = tracks.joinToString("\n") { track ->
-        val elapsedTime = track.startTime - firstStartTime
+        val elapsedTime = track.timestamp - firstStartTime
 
         val endTimestamp = track.endTime - firstStartTime
-        val overlap = lastEndTime - track.startTime
+        val overlap = lastEndTime - track.timestamp
 //        val formattedTime = "${elapsedTime.formatTimestamp()} - ${endTimestamp.formatTimestamp()} ${track.deck} $overlap"
 
         lastEndTime = track.endTime
@@ -212,7 +225,7 @@ fun createTracklist(trackList: TrackList) {
         }
 
         val debugInfo = """
-            trackNum:   ${track.trackNum}
+            trackNum:   ${track.position}
             artist:  $artist
             title:   $title
             genre:   ${track.genre}
@@ -297,9 +310,9 @@ fun cleanFilePath(filePath: String): String {
 
 fun main(vararg args: String) {
     val filePath = args.getOrNull(0)
-//     ?: "C:\\Users\\nikky\\Downloads\\HISTORY.html"
-//     ?: "Timeship - 250309 - Open Decks.html"
-//        ?: "C:\\Users\\nikky\\Downloads\\Timeship - Open Decks - Ignore Cued Track.html"
+        ?: "HISTORY.html".takeIf {
+            FileSystem.SYSTEM.exists(it.toPath())
+        }
         ?: run {
             println("Enter the path to the HTML file: ")
             print("> ")
@@ -311,7 +324,9 @@ fun main(vararg args: String) {
     val parsedHtml = parseHtmlFile(filePath.toPath())
 
     if (parsedHtml != null) {
-        createTracklist(parsedHtml)
+//        createTracklist(parsedHtml)
+        Template.write(parsedHtml, TrackData.serializer())
+        genreBreakdown(parsedHtml.songs) { genre }
     }
 
     println("")

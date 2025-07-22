@@ -1,2 +1,5 @@
-*.html
 *.txt
+*.html
+*.md
+
+!README.md

@@ -1,13 +1,8 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
-group = "moe.nikky"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
 kotlin {
     mingwX64 {
         binaries {
@@ -25,6 +20,7 @@ kotlin {
     }
     sourceSets {
         mingwMain.dependencies {
+            implementation(project(":shared"))
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:_")
             implementation("com.fleeksoft.ksoup:ksoup:_")
             implementation("com.squareup.okio:okio:_")

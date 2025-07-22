@@ -8,4 +8,4 @@ all histories in the rekordbox database will be exported into tracklists as `txt
 
 (existing files will be updated)
 
-## download [rekordbox-history-exporter.exe](https://github.com/NikkyAI/setlist-export/releases/download/nightly/rekordbox-history-exporter.exe)
+## download [rekordbox-export.exe](https://github.com/NikkyAI/setlist-export/releases/download/nightly/rekordbox-export.exe)
