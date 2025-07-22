@@ -1,0 +1,19 @@
+import kotlin.Boolean;
+import kotlin.time.Instant;
+
+CREATE TABLE `djmdSongHistory` (
+`ID` TEXT PRIMARY KEY,
+`HistoryID` TEXT DEFAULT NULL,
+`ContentID` TEXT DEFAULT NULL,
+`TrackNo` INTEGER DEFAULT NULL,
+`UUID` TEXT DEFAULT NULL,
+`rb_data_status` INTEGER DEFAULT 0,
+`rb_local_data_status` INTEGER DEFAULT 0,
+`rb_local_deleted` INTEGER AS Boolean DEFAULT 0,
+`rb_local_synced` INTEGER AS Boolean DEFAULT 0,
+-- `usn` BIGINT DEFAULT NULL,
+`usn` INTEGER DEFAULT NULL,
+`rb_local_usn` INTEGER DEFAULT NULL,
+`created_at` INTEGER AS Instant NOT NULL,
+`updated_at` INTEGER AS Instant NOT NULL
+);

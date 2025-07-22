@@ -1,0 +1,13 @@
+-- CREATE TABLE `djmdAlbum` (`ID` VARCHAR(255)
+-- PRIMARY KEY, `Name` VARCHAR(255) DEFAULT NULL,
+-- `AlbumArtistID` VARCHAR(255) DEFAULT NULL,
+-- `ImagePath` VARCHAR(255) DEFAULT NULL,
+-- `Compilation` INTEGER DEFAULT NULL, `SearchStr`
+-- VARCHAR(255) DEFAULT NULL, `UUID` VARCHAR(255)
+-- DEFAULT NULL, `rb_data_status` INTEGER DEFAULT 0,
+-- `rb_local_data_status` INTEGER DEFAULT 0,
+-- `rb_local_deleted` TINYINT(1) DEFAULT 0,
+-- `rb_local_synced` TINYINT(1) DEFAULT 0, `usn`
+-- BIGINT DEFAULT NULL, `rb_local_usn` BIGINT
+-- DEFAULT NULL, `created_at` DATETIME NOT NULL,
+-- `updated_at` DATETIME NOT NULL)
