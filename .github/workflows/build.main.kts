@@ -48,24 +48,27 @@ workflow(
 
         uses(
             name = "setup gradle",
-            action = ActionsSetupGradle()
-        )
-
-        uses(
-            name = "setup msys2",
-            action = SetupMsys2_Untyped(
-                msystem_Untyped = "MINGW64",
-                update_Untyped = "true",
-                // unsure which of the packages is necessary
-                install_Untyped = "git mingw-w64-x86_64-toolchain libsqlite"
+            action = ActionsSetupGradle(
+                addJobSummaryAsPrComment = ActionsSetupGradle.AddJobSummaryAsPrComment.OnFailure,
+                cacheDisabled = true,
             )
         )
+
+//        uses(
+//            name = "setup msys2",
+//            action = SetupMsys2_Untyped(
+//                msystem_Untyped = "MINGW64",
+//                update_Untyped = "true",
+//                // unsure which of the packages is necessary
+//                install_Untyped = "git mingw-w64-x86_64-toolchain libsqlite"
+//            )
+//        )
 
         uses(
             name = "cache gradle",
             action = Cache(
                 path = listOf("~/.gradle/caches"),
-                key = "${expr { runner.os }}-gradle-${ expr(hashFiles("*.gradle.kts", quote = true) )}",
+                key = "${expr { runner.os }}-gradle-${ expr(hashFiles("*.gradle.kts", "**/*.gradle.kts", quote = true) )}",
                 restoreKeys = listOf(
                     "${expr { runner.os }}-gradle-"
                 )
@@ -76,7 +79,7 @@ workflow(
             name = "cache konan",
             action = Cache(
                 path = listOf("~/.konan"),
-                key = "${expr { runner.os }}-konan-${ expr(hashFiles("*.gradle.kts", quote = true) )}",
+                key = "${expr { runner.os }}-konan-${ expr(hashFiles("*.gradle.kts", "**/*.gradle.kts", quote = true) )}",
                 restoreKeys = listOf(
                     "${expr { runner.os }}-konan-"
                 )

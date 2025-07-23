@@ -12,7 +12,7 @@ kotlin {
             executable() {
                 entryPoint = "main"
                 if(System.getenv("CI") == null) {
-                    baseName = "virtualdj-export-a"
+                    baseName = "virtualdj-export-testbuild"
                 }
                 runTaskProvider?.get()?.also { runTask ->
                     val args = providers.gradleProperty("runArgs")
