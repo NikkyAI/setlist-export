@@ -45,14 +45,14 @@ jobs:
       uses: 'actions/cache@v4'
       with:
         path: '~/.gradle/caches'
-        key: '${{ runner.os }}-gradle-${{ hashFiles(*.gradle.kts) }}'
+        key: '${{ runner.os }}-gradle-${{ hashFiles(''*.gradle.kts'') }}'
         restore-keys: '${{ runner.os }}-gradle-'
     - id: 'step-4'
       name: 'cache konan'
       uses: 'actions/cache@v4'
       with:
         path: '~/.konan'
-        key: '${{ runner.os }}-konan-${{ hashFiles(*.gradle.kts) }}'
+        key: '${{ runner.os }}-konan-${{ hashFiles(''*.gradle.kts'') }}'
         restore-keys: '${{ runner.os }}-konan-'
     - id: 'step-5'
       run: 'echo "c:\msys64\mingw64\bin" >> $GITHUB_PATH'

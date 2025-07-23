@@ -65,7 +65,7 @@ workflow(
             name = "cache gradle",
             action = Cache(
                 path = listOf("~/.gradle/caches"),
-                key = "${expr { runner.os }}-gradle-${ expr(hashFiles("*.gradle.kts") )}",
+                key = "${expr { runner.os }}-gradle-${ expr(hashFiles("*.gradle.kts", quote = true) )}",
                 restoreKeys = listOf(
                     "${expr { runner.os }}-gradle-"
                 )
@@ -76,7 +76,7 @@ workflow(
             name = "cache konan",
             action = Cache(
                 path = listOf("~/.konan"),
-                key = "${expr { runner.os }}-konan-${ expr(hashFiles("*.gradle.kts") )}",
+                key = "${expr { runner.os }}-konan-${ expr(hashFiles("*.gradle.kts", quote = true) )}",
                 restoreKeys = listOf(
                     "${expr { runner.os }}-konan-"
                 )
