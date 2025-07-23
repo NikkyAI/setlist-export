@@ -14,10 +14,11 @@ plugins {
 rootProject.name = "setlist-export"
 
 include("shared")
-include("traktor")
-include("rekordbox")
-include("mixxx")
+include("traktor-convert")
+include("rekordbox-export")
+include("mixxx-export")
+include("virtualdj-export")
 
-project(":traktor").name = "traktor-export-converter"
-project(":rekordbox").name = "rekordbox-export"
-project(":mixxx").name = "mixxx-export"
+//project(":traktor").name = "traktor-export-converter"
+//project(":rekordbox").name = "rekordbox-export"
+//project(":mixxx").name = "mixxx-export"

@@ -22,7 +22,9 @@ object Template {
     val default = """
         {time} {artist} - {title}
     """.trimIndent().trim()
-    fun load(): (JsonObject) -> String {
+    fun load(
+        defaultTemplate: String = default
+    ): (JsonObject) -> String {
         val templatePath = "template.txt".toPath()
         val exists = FileSystem.SYSTEM.exists(templatePath)
         val templateString = if(exists) {
@@ -32,10 +34,10 @@ object Template {
         } else {
             FileSystem.SYSTEM.write(templatePath) {
                 writeUtf8(
-                    default
+                    defaultTemplate
                 )
             }
-            default
+            defaultTemplate
         }
 
         return { song: JsonObject ->
@@ -48,9 +50,10 @@ object Template {
     fun <E> write(
         basename: String,
         songs: List<E>,
-        serializer: KSerializer<E>
+        serializer: KSerializer<E>,
+        defaultTemplate: String = default
     ) {
-        val formatter = load()
+        val formatter = load(defaultTemplate)
 
         val jsonString = json.encodeToString(ListSerializer(serializer), songs)
         println(jsonString)
@@ -110,31 +113,21 @@ object Template {
             writeUtf8(md)
         }
 
+        println("\n")
+
     }
 
     fun <E> write(
-        playlist: Playlist<E>,
-        serializer: KSerializer<E>
+        playlist: Tracklist<E>,
+        serializer: KSerializer<E>,
+        defaultTemplate: String = default,
     ) {
         write(
             basename = playlist.title,
-            songs = playlist.songs,
-            serializer = serializer
+            songs = playlist.tracks,
+            serializer = serializer,
+            defaultTemplate = defaultTemplate
         )
     }
 }
 
-fun <E> genreBreakdown(
-    tracks: List<E>,
-    getGenre: E.() -> String?
-) {
-    if(tracks.all { it.getGenre() == null }) return
-
-    val genreCount = tracks.groupingBy { it.getGenre() }.eachCount()
-    println("")
-    println("GENRES: ")
-    genreCount.entries.sortedByDescending { it.value }
-        .forEach {
-            println("${it.value} x ${it.key}")
-        }
-}

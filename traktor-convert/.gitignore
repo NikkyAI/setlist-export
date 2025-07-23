@@ -1,0 +1,6 @@
+*.txt
+*.html
+*.md
+/run/
+
+!README.md

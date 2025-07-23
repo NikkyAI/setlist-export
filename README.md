@@ -1,7 +1,9 @@
 # setlist-export
 
-## [traktor](./traktor/README.md)
+## [traktor](./traktor-convert/README.md)
 
-## [rekordbox](./rekordbox/README.md)
+## [rekordbox](./rekordbox-export/README.md)
 
-## [mixxx](./mixxx/README.md)
+## [mixxx](./mixxx-export/README.md)
+
+## [virtualdj](./virtualdj-export/README.md)

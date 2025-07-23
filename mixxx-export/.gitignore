@@ -1,0 +1,5 @@
+*.txt
+*.md
+/run/
+
+!README.md

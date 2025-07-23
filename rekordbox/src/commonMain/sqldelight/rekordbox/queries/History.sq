@@ -1,2 +1,0 @@
-selectAll:
-    SELECT * FROM djmdHistory;

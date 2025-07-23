@@ -1,4 +1,0 @@
-selectAll:
-    SELECT * FROM djmdSongHistory;
-selectWithHistoryId:
-    SELECT * FROM djmdSongHistory WHERE HistoryID = :historyId;

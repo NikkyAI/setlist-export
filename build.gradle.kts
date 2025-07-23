@@ -21,9 +21,10 @@ allprojects {
 
 tasks {
     val subprojects = listOf(
-        project(":traktor-export-converter"),
+        project(":traktor-convert"),
         project(":rekordbox-export"),
         project(":mixxx-export"),
+        project(":virtualdj-export"),
     )
     val packageZip by registering(Zip::class) {
         group = "package"

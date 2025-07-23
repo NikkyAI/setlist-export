@@ -1,0 +1,6 @@
+*.txt
+*.md
+*.cue
+/run/
+
+!README.md
