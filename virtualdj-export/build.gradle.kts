@@ -11,7 +11,7 @@ kotlin {
         binaries {
             executable() {
                 entryPoint = "main"
-                baseName = "a"
+//                baseName = "a"
                 runTaskProvider?.get()?.also { runTask ->
                     val args = providers.gradleProperty("runArgs")
                     runTask.workingDir = file("run").also { it.mkdirs() }

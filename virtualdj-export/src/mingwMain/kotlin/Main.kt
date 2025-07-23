@@ -158,7 +158,7 @@ fun main(vararg args: String) {
             Template.write(
                 playlist,
                 Track.serializer(),
-                
+
             )
         }
 
