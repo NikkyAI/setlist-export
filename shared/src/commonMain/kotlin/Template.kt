@@ -23,9 +23,10 @@ object Template {
         {time} {artist} - {title}
     """.trimIndent().trim()
     fun load(
-        defaultTemplate: String = default
+        defaultTemplate: String = default,
+        templateKey: String = "template",
     ): (JsonObject) -> String {
-        val templatePath = "template.txt".toPath()
+        val templatePath = "$templateKey.txt".toPath()
         val exists = FileSystem.SYSTEM.exists(templatePath)
         val templateString = if(exists) {
             FileSystem.SYSTEM.read(templatePath) {
@@ -51,9 +52,10 @@ object Template {
         basename: String,
         songs: List<E>,
         serializer: KSerializer<E>,
-        defaultTemplate: String = default
+        defaultTemplate: String = default,
+        templateKey: String = "template",
     ) {
-        val formatter = load(defaultTemplate)
+        val formatter = load(defaultTemplate, templateKey)
 
         val jsonString = json.encodeToString(ListSerializer(serializer), songs)
         println(jsonString)
@@ -121,12 +123,14 @@ object Template {
         playlist: Tracklist<E>,
         serializer: KSerializer<E>,
         defaultTemplate: String = default,
+        templateKey: String = "template",
     ) {
         write(
             basename = playlist.title,
             songs = playlist.tracks,
             serializer = serializer,
-            defaultTemplate = defaultTemplate
+            defaultTemplate = defaultTemplate,
+            templateKey = templateKey,
         )
     }
 }

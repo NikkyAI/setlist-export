@@ -3,7 +3,7 @@ import kotlin.time.Duration
 import kotlin.time.Instant
 
 @Serializable
-data class Track(
+data class SimpleTrack(
     val position: Int,
     @Serializable(with=DurationSerializer::class)
     val time: Duration,
@@ -11,8 +11,8 @@ data class Track(
 //    val timestamp: Instant,
 //    @Serializable(with=DurationSerializer::class)
 //    val duration: Duration?,
-    val artist: String,
     val title: String,
+//    val artist: String,
 //    val album: String?,
 //    val year: String?,
 //    val genre: String?,

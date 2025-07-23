@@ -8,8 +8,9 @@ all playlists in the VirtualDJ database (XML) will be exported into tracklists a
 
 (existing files will be updated)
 
-getting mre than just the trackname proves itself to be fairly complicated 
-since there is no consistency in the virtualdj "database" xml file  
-working on it
+alternatively a `.cue` file or folder containing them can be dragged onm the `exe` to parse only those
+
+this tool requires the `cue` files that virtualdj creates when recording a set for giving more accurate exports
+the files are by default found automatically 
 
 ## download [virtualdj-export.exe](https://github.com/NikkyAI/setlist-export/releases/download/nightly/mixxx-export.exe)
