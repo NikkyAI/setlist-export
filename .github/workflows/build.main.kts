@@ -19,14 +19,12 @@ import io.github.typesafegithub.workflows.actions.actions.Checkout
 import io.github.typesafegithub.workflows.actions.gradle.ActionsSetupGradle
 import io.github.typesafegithub.workflows.actions.jimeh.UpdateTagsAction_Untyped
 import io.github.typesafegithub.workflows.actions.softprops.ActionGhRelease
-import io.github.typesafegithub.workflows.actions.msys2.SetupMsys2_Untyped
 import io.github.typesafegithub.workflows.domain.RunnerType
 import io.github.typesafegithub.workflows.domain.triggers.Push
 import io.github.typesafegithub.workflows.dsl.expressions.Contexts.hashFiles
 import io.github.typesafegithub.workflows.dsl.expressions.expr
 import io.github.typesafegithub.workflows.dsl.workflow
 import io.github.typesafegithub.workflows.yaml.ConsistencyCheckJobConfig
-import kotlin.script.experimental.jvmhost.JvmScriptEvaluationConfigurationBuilder.Companion.append
 
 workflow(
     name = "build",
@@ -50,7 +48,8 @@ workflow(
             name = "setup gradle",
             action = ActionsSetupGradle(
                 addJobSummaryAsPrComment = ActionsSetupGradle.AddJobSummaryAsPrComment.OnFailure,
-                cacheDisabled = true,
+//                cacheDisabled = true,
+                cacheOverwriteExisting = true,
             )
         )
 
@@ -63,30 +62,36 @@ workflow(
 //                install_Untyped = "git mingw-w64-x86_64-toolchain libsqlite"
 //            )
 //        )
+//        run(command = "echo \"c:\\msys64\\mingw64\\bin\" >> \$GITHUB_PATH")
 
-        uses(
-            name = "cache gradle",
-            action = Cache(
-                path = listOf("~/.gradle/caches"),
-                key = "${expr { runner.os }}-gradle-${ expr(hashFiles("*.gradle.kts", "**/*.gradle.kts", quote = true) )}",
-                restoreKeys = listOf(
-                    "${expr { runner.os }}-gradle-"
-                )
-            )
+
+        val fileHash = hashFiles(
+            "*.gradle.kts",
+            "**/*.gradle.kts",
+            "versions.properties",
+            quote = true
         )
+//        uses(
+//            name = "cache gradle",
+//            action = Cache(
+//                path = listOf("~/.gradle/caches"),
+//                key = "${expr { runner.os }}-gradle-${expr (fileHash)}",
+//                restoreKeys = listOf(
+//                    "${expr { runner.os }}-gradle-"
+//                )
+//            )
+//        )
 
         uses(
             name = "cache konan",
             action = Cache(
                 path = listOf("~/.konan"),
-                key = "${expr { runner.os }}-konan-${ expr(hashFiles("*.gradle.kts", "**/*.gradle.kts", quote = true) )}",
+                key = "${expr { runner.os }}-konan-${expr (fileHash)}",
                 restoreKeys = listOf(
                     "${expr { runner.os }}-konan-"
                 )
             )
         )
-
-        run(command = "echo \"c:\\msys64\\mingw64\\bin\" >> \$GITHUB_PATH")
 
         run(command = "./gradlew packageZip copyExecutables --no-daemon")
 

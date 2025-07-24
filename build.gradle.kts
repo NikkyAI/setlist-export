@@ -30,7 +30,7 @@ tasks {
         group = "package"
         subprojects.forEach { subproject ->
 //            dependsOn(it.tasks["linkDebugExecutableMingwX64"])
-            from(subproject.tasks["linkDebugExecutableMingwX64"])
+            from(subproject.tasks["linkReleaseExecutableMingwX64"])
         }
         archiveBaseName.set("dist")
         destinationDirectory.set(project.layout.buildDirectory)
@@ -39,7 +39,7 @@ tasks {
         group = "package"
         subprojects.forEach { subproject ->
 //            dependsOn(it.tasks["linkDebugExecutableMingwX64"])
-            from(subproject.tasks["linkDebugExecutableMingwX64"])
+            from(subproject.tasks["linkReleaseExecutableMingwX64"])
         }
         destinationDir = project.layout.buildDirectory.get().asFile
     }
