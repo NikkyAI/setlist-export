@@ -309,6 +309,9 @@ fun cleanFilePath(filePath: String): String {
 }
 
 fun main(vararg args: String) {
+    val documents = executeCommand("powershell.exe -Command [Environment]::GetFolderPath('MyDocuments')")
+    println(documents)
+
     val filePath = args.getOrNull(0)
         ?: "HISTORY.html".takeIf {
             FileSystem.SYSTEM.exists(it.toPath())

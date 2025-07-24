@@ -32,8 +32,8 @@ tasks {
 //            dependsOn(it.tasks["linkDebugExecutableMingwX64"])
             from(subproject.tasks["linkReleaseExecutableMingwX64"])
         }
-        archiveBaseName.set("dist")
-        destinationDirectory.set(project.layout.buildDirectory)
+        archiveBaseName = "dist"
+        destinationDirectory = project.layout.buildDirectory
     }
     val copyExecutables by registering(Copy::class) {
         group = "package"
@@ -41,6 +41,6 @@ tasks {
 //            dependsOn(it.tasks["linkDebugExecutableMingwX64"])
             from(subproject.tasks["linkReleaseExecutableMingwX64"])
         }
-        destinationDir = project.layout.buildDirectory.get().asFile
+        destinationDir = file(project.layout.buildDirectory)
     }
 }

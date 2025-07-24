@@ -1,4 +1,4 @@
-# mixx tracklist exporter
+# mixxx tracklist exporter
 
 ## how to use
 

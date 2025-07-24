@@ -37,28 +37,6 @@ val httpClient = HttpClient(WinHttp) {
 val TMP = FileSystem.SYSTEM_TEMPORARY_DIRECTORY
 val FS = FileSystem.SYSTEM
 
-//val sqliteDatetimeFormat = DateTimeComponents.Format {
-//    year();
-//    char('-');
-//    monthNumber();
-//    char('-');
-//    day()
-//    char(' ')
-//    hour()
-//    char(':')
-//    minute()
-//    char(':')
-//    second()
-//    optional {
-//        char('.')
-//        secondFraction(1, 9)
-//    }
-//    char(' ')
-//    offsetHours()
-//    char(':')
-//    offsetMinutesOfHour()
-//}
-
 val outputTimestampFormat = LocalTime.Format {
     hour(Padding.ZERO)
     char(':')

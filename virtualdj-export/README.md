@@ -1,4 +1,4 @@
-# mixx tracklist exporter
+# VirtualDJ tracklist exporter
 
 ## how to use
 
